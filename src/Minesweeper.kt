@@ -1,7 +1,7 @@
 package dev.biogustav.minesweeper
 
-import kotlin.random.Random
 import kotlin.math.min
+import kotlin.random.Random
 
 
 data class Field(val width: Int = 10, val height: Int = 10, val n: Int = width * height / 4) {
@@ -49,7 +49,7 @@ data class Board(val difficulty: Difficulty) {
     private var board = Array(field.width * field.height) { FieldState.UNTOUCHED }
 
     fun reveal(x: Int, y: Int) {
-        if (this[x,y] == FieldState.FLAGGED) count++
+        if (this[x, y] == FieldState.FLAGGED) count++
         if (field.isBomb(x, y)) {
             state = GameState.COMPLETE
             result = GameResult.LOST
@@ -64,7 +64,7 @@ data class Board(val difficulty: Difficulty) {
 
         this[x, y] = FieldState.REVEALED
 
-        if (board.filterIndexed() { i, _ -> !field.isBomb(i) }.all { it != FieldState.UNTOUCHED }) {
+        if (board.filterIndexed { i, _ -> !field.isBomb(i) }.all { it != FieldState.UNTOUCHED }) {
             state = GameState.COMPLETE
             result = GameResult.WON
         }
@@ -85,13 +85,13 @@ data class Board(val difficulty: Difficulty) {
     }
 
     fun flag(x: Int, y: Int) {
-        if (this[x,y] == FieldState.FLAGGED) return
+        if (this[x, y] == FieldState.FLAGGED) return
         this[x, y] = FieldState.FLAGGED
         count--
     }
 
     fun question(x: Int, y: Int) {
-        if (this[x,y] == FieldState.FLAGGED) count++
+        if (this[x, y] == FieldState.FLAGGED) count++
         this[x, y] = FieldState.QUESTIONED
     }
 
@@ -100,6 +100,7 @@ data class Board(val difficulty: Difficulty) {
             FieldState.FLAGGED -> {
                 count++
             }
+
             FieldState.QUESTIONED -> {}
             else -> return
         }
@@ -137,7 +138,8 @@ data class Board(val difficulty: Difficulty) {
                 .joinToString("  ") { (i, s) -> s.repr(field[i]) }
                 .chunked(field.width * 3)
                 .withIndex()
-                .joinToString("\n") { (i, s) -> "%2d | %s".format(i, s) }) }
+                .joinToString("\n") { (i, s) -> "%2d | %s".format(i, s) })
+        }
         return sb
     }
 }

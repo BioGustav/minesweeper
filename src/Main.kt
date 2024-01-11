@@ -46,6 +46,7 @@ fun main() {
                     println("Invalid coordinates!")
                 }
             }
+
             "x" -> {
                 terminate = true
             }
