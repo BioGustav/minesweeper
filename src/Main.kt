@@ -20,9 +20,9 @@ fun main() {
         var command: String
 
         do {
-            print("Enter a command (Choose field[c], Exit[x]): ")
+            print("Enter a command (Choose field[c], Exit[e]): ")
             command = readlnOrNull() ?: ""
-        } while (command !in listOf("c", "x"))
+        } while (command !in listOf("c", "e"))
 
         when (command) {
             "c" -> {
@@ -32,22 +32,24 @@ fun main() {
                 val y = readlnOrNull()?.toIntOrNull()
 
                 if (x != null && y != null && x in (0..<difficulty.size) && y in (0..<difficulty.size)) {
-                    print("Enter action (Reveal[r], Flag[f], Question[q], Clear[c], Abort[a]: ")
-                    val action = readlnOrNull() ?: ""
-                    when (action) {
-                        "r" -> game.reveal(x, y)
-                        "f" -> game.flag(x, y)
-                        "q" -> game.question(x, y)
-                        "c" -> game.clear(x, y)
-                        "a" -> continue
-                        else -> println("Invalid action!")
-                    }
+                    do {
+                        print("Enter action (Reveal[r], Flag[f], Question[q], Clear[c], Abort[a]: ")
+                        val action = readlnOrNull() ?: ""
+                        when (action) {
+                            "r" -> game.reveal(x, y)
+                            "f" -> game.flag(x, y)
+                            "q" -> game.question(x, y)
+                            "c" -> game.clear(x, y)
+                            "a" -> continue
+                            else -> println("Invalid action!")
+                        }
+                    } while (action !in listOf("r", "f", "q", "c", "a"))
                 } else {
                     println("Invalid coordinates!")
                 }
             }
 
-            "x" -> {
+            "e" -> {
                 terminate = true
             }
         }
@@ -62,5 +64,4 @@ fun main() {
     } else {
         println("Game aborted!")
     }
-
 }

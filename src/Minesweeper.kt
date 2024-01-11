@@ -1,18 +1,24 @@
 package dev.biogustav.minesweeper
 
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
 
 
 data class Field(val width: Int = 10, val height: Int = 10, val n: Int = width * height / 4) {
-    private val maxBombs = width * height
-    private val rng = Random
-    val nBombs = min(n, maxBombs)
+    private val maxBombs: Int
+        get() = width * height
+    private val rng: Random
+        get() = Random
 
-    private val fields = IntArray(width * height) { 0 }.apply {
+    private val nBombs = max(min(n, maxBombs), 0)
+
+    private val fields = IntArray(width * height) { 0 }.apply Array@{
         val bombPositions = mutableSetOf<Pair<Int, Int>>().apply {
             while (size < nBombs) {
-                add(rng.nextInt(0, width) to rng.nextInt(0, height))
+                val x = rng.nextInt(0, width)
+                val y = rng.nextInt(0, height)
+                add(x to y)
             }
         }
 
@@ -26,6 +32,7 @@ data class Field(val width: Int = 10, val height: Int = 10, val n: Int = width *
         }
     }
 
+
     operator fun get(x: Int, y: Int) = fields[y * width + x]
     operator fun get(i: Int) = fields[i]
     operator fun IntArray.set(x: Int, y: Int, value: Int) {
@@ -34,7 +41,10 @@ data class Field(val width: Int = 10, val height: Int = 10, val n: Int = width *
 
     operator fun IntArray.get(x: Int, y: Int) = this[y * width + x]
 
-    override fun toString() = fields.joinToString(" ") { "%2d".format(it) }.chunked(width * 3).joinToString("\n")
+    override fun toString() = fields
+        .joinToString(" ") { "%2d".format(it) }
+        .chunked(width * 3)
+        .joinToString("\n")
 
     fun isBomb(x: Int, y: Int) = this[x, y] < 0
     fun isBomb(i: Int) = this[i] < 0
@@ -43,9 +53,8 @@ data class Field(val width: Int = 10, val height: Int = 10, val n: Int = width *
 data class Board(val difficulty: Difficulty) {
     var state = GameState.PLAYING
     var result = GameResult.WON
-
     private val field = Field(difficulty.size, difficulty.size, difficulty.nBombs)
-    private var count = field.nBombs
+    private var count = difficulty.nBombs
     private var board = Array(field.width * field.height) { FieldState.UNTOUCHED }
 
     fun reveal(x: Int, y: Int) {
@@ -157,24 +166,31 @@ fun forSurrounding(x: Int, y: Int, width: Int, height: Int, action: (Int, Int) -
 }
 
 enum class FieldState {
-    UNTOUCHED, FLAGGED, QUESTIONED, REVEALED
-}
+    UNTOUCHED,
+    FLAGGED,
+    QUESTIONED,
+    REVEALED;
 
-fun FieldState.repr(x: Int = 0) = when (this) {
-    FieldState.UNTOUCHED -> "☐"
-    FieldState.FLAGGED -> "!"
-    FieldState.QUESTIONED -> "?"
-    FieldState.REVEALED -> if (x == 0) " " else if (x < 0) "*" else "$x"
+    fun repr(x: Int = 0) = when (this) {
+        UNTOUCHED -> "□"
+        FLAGGED -> "⚑"
+        QUESTIONED -> "?"
+        REVEALED -> if (x == 0) " " else if (x < 0) "*" else "$x"
+    }
 }
 
 enum class Difficulty(val size: Int, val nBombs: Int) {
-    EASY(9, 10), MEDIUM(16, 40), HARD(24, 99)
+    EASY(9, 10),
+    MEDIUM(16, 40),
+    HARD(24, 99)
 }
 
 enum class GameState {
-    PLAYING, COMPLETE,
+    PLAYING,
+    COMPLETE,
 }
 
 enum class GameResult {
-    WON, LOST
+    WON,
+    LOST
 }
